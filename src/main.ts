@@ -1,6 +1,38 @@
 const iconView = document.getElementById("iconView")!;
-const mapCanvas = document.getElementById("mapCanvas")!;
+const mapCanvas = document.getElementById("mapCanvas") as HTMLCanvasElement;
 const divMessage = document.getElementById("divMessage")!;
+const bSave = document.getElementById("bSave")!;
+
+
+interface SpriteLayout {
+  width: number;
+  height: number;
+  x: number;
+  y: number;
+  name: string;
+  image: HTMLImageElement;
+}
+
+interface FrameDef {
+  frame: {
+    x: number,
+    y: number,
+    w: number,
+    h: number
+  },
+  rotated: false,
+  trimmed: false,
+  spriteSourceSize: {
+    x: number,
+    y: number,
+    w: number,
+    h: number
+  },
+  sourceSize: {
+    w: number,
+    h: number
+  }
+}
 
 // Make the demo a drop zone for loading json
 mapCanvas.ondrop = (evt) => {
@@ -13,8 +45,22 @@ mapCanvas.ondrop = (evt) => {
   }
 }
 
+mapCanvas.ondragover = (evt) => {
+  // Prevent file from being opened
+  evt.preventDefault();
+}
+
+bSave.onclick = () => {
+  const link = document.createElement("a");
+  link.download = "image.png";
+  link.href = mapCanvas.toDataURL("image/png");
+  link.click();
+  // var image = mapCanvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+  // window.location.href=image; // Save
+}
+
 var numErrors = 0;
-var icons: HTMLImageElement[] = [];
+var icons: SpriteLayout[] = [];
 var padding = 2;
 
 async function processDataTransfer(items: DataTransferItem[]) {
@@ -35,7 +81,7 @@ async function processDataTransfer(items: DataTransferItem[]) {
         const img = await loadImage(file);
         iconView.appendChild(img);
         console.log(`image size: ${img.width} x ${img.height}`);
-        icons.push(img);
+        icons.push({ width: img.width, height: img.height, x: 0, y: 0, name: stripExtension(file.name), image: img });
       }
       catch (e) {
         numErrors++;
@@ -50,11 +96,17 @@ async function processDataTransfer(items: DataTransferItem[]) {
   const errorText = numErrors ? ` <span style="color: red;">Errors: ${numErrors}.</span>` : '';
   divMessage.innerHTML = `Added ${icons.length} icons.${errorText}`;
 
+  pack(2, 2);
 }
 
-mapCanvas.ondragover = (evt) => {
-  // Prevent file from being opened
-  evt.preventDefault();
+function stripExtension(s: string) {
+  const idx = s.indexOf(".");
+  if (idx >= 0) {
+    return s.substring(0, idx);
+  }
+  else {
+    return s;
+  }
 }
 
 function loadImage(file: File): Promise<HTMLImageElement> {
@@ -68,4 +120,74 @@ function loadImage(file: File): Promise<HTMLImageElement> {
     img.onerror = reject;
     img.src = url;
   });
+}
+
+
+function pack(spacing: number, padding: number) {
+  // Simple pack, for testing
+  let h = padding;
+  let w = padding;
+  let x = padding;
+  let y = padding;
+  for (const sprite of icons) {
+    sprite.x = x;
+    sprite.y = y;
+    x += sprite.width + spacing;
+    w = Math.max(x + padding, w);
+    h = Math.max(y + sprite.height + padding, h);
+  }
+  console.log(`Packed: w = ${w}, h = ${h}`);
+
+  function toFrame(sprite: SpriteLayout): FrameDef {
+    return {
+      frame: {
+        x: sprite.x,
+        y: sprite.y,
+        w: sprite.width,
+        h: sprite.height
+      },
+      rotated: false,
+      trimmed: false,
+      spriteSourceSize: {
+        x: 0,
+        y: 0,
+        w: sprite.width,
+        h: sprite.height
+      },
+      sourceSize: {
+        w: sprite.width, h: sprite.height
+      }
+    }
+  }
+
+
+  // Create json pack info
+  const frames: {[id: string]: FrameDef } = {};
+  for (const sprite of icons) {
+    frames[sprite.name] = toFrame(sprite);
+  }
+  const jsoPack = {
+    frames,
+    meta: {
+      "app": "Texture Mapper",
+      "version": "0.1",
+      "image": "icons.png",
+      "format": "RGBA8888",
+      "size": {
+        "w": w,
+        "h": h
+      },
+      "scale": "1"
+    }
+  }
+
+  console.log(jsoPack);
+
+  // Pack into canvas
+  mapCanvas.width = w;
+  mapCanvas.height = h;
+  const ctx = mapCanvas.getContext("2d")!;
+  for (const sprite of icons) {
+    ctx.drawImage(sprite.image, sprite.x, sprite.y);
+  }
 }
