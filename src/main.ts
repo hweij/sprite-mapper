@@ -51,17 +51,25 @@ mapCanvas.ondragover = (evt) => {
 }
 
 bSave.onclick = () => {
-  const link = document.createElement("a");
-  link.download = "image.png";
-  link.href = mapCanvas.toDataURL("image/png");
-  link.click();
-  // var image = mapCanvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-  // window.location.href=image; // Save
+  {
+    const link = document.createElement("a");
+    link.download = "image.png";
+    link.href = mapCanvas.toDataURL("image/png");
+    link.click();
+  }
+  {
+    const file = new Blob([JSON.stringify(jsoPack)], { type: 'application/json' });
+    const link = document.createElement("a");
+    link.download = "image.json";
+    link.href = window.URL.createObjectURL(file);
+    link.click();
+  }
 }
 
 var numErrors = 0;
 var icons: SpriteLayout[] = [];
 var padding = 2;
+var jsoPack: object;
 
 async function processDataTransfer(items: DataTransferItem[]) {
   icons = [];
@@ -93,6 +101,8 @@ async function processDataTransfer(items: DataTransferItem[]) {
       }
     }
   }
+  // Sort icons, from largest to smallest
+  icons.sort((a, b) => Math.max(b.width, b.height) - Math.max(a.width, a.height));
   const errorText = numErrors ? ` <span style="color: red;">Errors: ${numErrors}.</span>` : '';
   divMessage.innerHTML = `Added ${icons.length} icons.${errorText}`;
 
@@ -162,11 +172,11 @@ function pack(spacing: number, padding: number) {
 
 
   // Create json pack info
-  const frames: {[id: string]: FrameDef } = {};
+  const frames: { [id: string]: FrameDef } = {};
   for (const sprite of icons) {
     frames[sprite.name] = toFrame(sprite);
   }
-  const jsoPack = {
+  jsoPack = {
     frames,
     meta: {
       "app": "Sprite Mapper",
