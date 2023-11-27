@@ -169,7 +169,7 @@ function pack(spacing: number, padding: number) {
   const jsoPack = {
     frames,
     meta: {
-      "app": "Texture Mapper",
+      "app": "Sprite Mapper",
       "version": "0.1",
       "image": "icons.png",
       "format": "RGBA8888",

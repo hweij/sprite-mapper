@@ -1,3 +1,3 @@
-# Texture mapper
+# Sprite mapper
 
-Web app to create sprite map / texture atlas.
+Web app to create sprite map / atlas.

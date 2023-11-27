@@ -1,7 +1,7 @@
 {
   "name": "texture_mapper",
   "version": "1.0.0",
-  "description": "Texture mapper",
+  "description": "Sprite mapper",
   "main": "main.js",
   "scripts": {
     "dev": "vite",
