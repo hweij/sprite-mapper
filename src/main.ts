@@ -106,7 +106,7 @@ async function processDataTransfer(items: DataTransferItem[]) {
   const errorText = numErrors ? ` <span style="color: red;">Errors: ${numErrors}.</span>` : '';
   divMessage.innerHTML = `Added ${icons.length} icons.${errorText}`;
 
-  pack(2, 2);
+  packLinear(2, 2);
 }
 
 function stripExtension(s: string) {
@@ -133,7 +133,7 @@ function loadImage(file: File): Promise<HTMLImageElement> {
 }
 
 
-function pack(spacing: number, padding: number) {
+function packLinear(spacing: number, padding: number) {
   // Simple pack, for testing
   let h = padding;
   let w = padding;
@@ -148,31 +148,54 @@ function pack(spacing: number, padding: number) {
   }
   console.log(`Packed: w = ${w}, h = ${h}`);
 
-  function toFrame(sprite: SpriteLayout): FrameDef {
-    return {
-      frame: {
-        x: sprite.x,
-        y: sprite.y,
-        w: sprite.width,
-        h: sprite.height
-      },
-      rotated: false,
-      trimmed: false,
-      spriteSourceSize: {
-        x: 0,
-        y: 0,
-        w: sprite.width,
-        h: sprite.height
-      },
-      sourceSize: {
-        w: sprite.width, h: sprite.height
-      }
+  // Create json pack info
+  createPackInfo(w, h);
+
+  console.log(jsoPack);
+
+  // Pack into canvas
+  mapCanvas.width = w;
+  mapCanvas.height = h;
+  const ctx = mapCanvas.getContext("2d")!;
+  for (const sprite of icons) {
+    ctx.drawImage(sprite.image, sprite.x, sprite.y);
+  }
+}
+
+interface SpriteTree {
+  width: number;
+  height: number;
+  x: number;
+  y: number;
+  sprite: SpriteLayout | null;
+  right: SpriteTree | null;
+  bottom: SpriteTree | null;
+}
+
+function toFrame(sprite: SpriteLayout): FrameDef {
+  return {
+    frame: {
+      x: sprite.x,
+      y: sprite.y,
+      w: sprite.width,
+      h: sprite.height
+    },
+    rotated: false,
+    trimmed: false,
+    spriteSourceSize: {
+      x: 0,
+      y: 0,
+      w: sprite.width,
+      h: sprite.height
+    },
+    sourceSize: {
+      w: sprite.width, h: sprite.height
     }
   }
+}
 
-
-  // Create json pack info
-  const frames: { [id: string]: FrameDef } = {};
+function createPackInfo(w: number, h: number) {
+  const frames: { [id: string]: FrameDef; } = {};
   for (const sprite of icons) {
     frames[sprite.name] = toFrame(sprite);
   }
@@ -189,15 +212,5 @@ function pack(spacing: number, padding: number) {
       },
       "scale": "1"
     }
-  }
-
-  console.log(jsoPack);
-
-  // Pack into canvas
-  mapCanvas.width = w;
-  mapCanvas.height = h;
-  const ctx = mapCanvas.getContext("2d")!;
-  for (const sprite of icons) {
-    ctx.drawImage(sprite.image, sprite.x, sprite.y);
-  }
+  };
 }
