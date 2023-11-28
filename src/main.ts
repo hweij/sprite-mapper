@@ -107,7 +107,7 @@ async function processDataTransfer(items: DataTransferItem[]) {
   divMessage.innerHTML = `Added ${icons.length} icons.${errorText}`;
 
   // packLinear(1, 1);
-  packTree(1, 1, 180, 170);
+  packTree(1, 1, 256, 256);
 }
 
 function stripExtension(s: string) {
