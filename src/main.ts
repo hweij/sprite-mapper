@@ -106,7 +106,7 @@ async function processDataTransfer(items: DataTransferItem[]) {
   const errorText = numErrors ? ` <span style="color: red;">Errors: ${numErrors}.</span>` : '';
   divMessage.innerHTML = `Added ${icons.length} icons.${errorText}`;
 
-  // packLinear(2, 2);
+  // packLinear(1, 1);
   packTree(1, 1, 180, 170);
 }
 
@@ -134,18 +134,20 @@ function loadImage(file: File): Promise<HTMLImageElement> {
 }
 
 
-function packLinear(spacing: number, padding: number) {
+function packLinear(spritePadding: number, padding: number) {
+  const spacing = spritePadding * 2;
+  const borderMargin = padding * 2;
   // Simple pack, for testing
-  let h = padding;
-  let w = padding;
-  let x = padding;
-  let y = padding;
+  let h = borderMargin;
+  let w = borderMargin;
+  let x = borderMargin;
+  let y = borderMargin;
   for (const sprite of icons) {
     sprite.x = x;
     sprite.y = y;
     x += sprite.width + spacing;
-    w = Math.max(x + padding, w);
-    h = Math.max(y + sprite.height + padding, h);
+    w = Math.max(x + borderMargin, w);
+    h = Math.max(y + sprite.height + borderMargin, h);
   }
   console.log(`Packed: w = ${w}, h = ${h}`);
 
