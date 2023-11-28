@@ -106,7 +106,8 @@ async function processDataTransfer(items: DataTransferItem[]) {
   const errorText = numErrors ? ` <span style="color: red;">Errors: ${numErrors}.</span>` : '';
   divMessage.innerHTML = `Added ${icons.length} icons.${errorText}`;
 
-  packLinear(2, 2);
+  // packLinear(2, 2);
+  packTree(1, 1, 180, 170);
 }
 
 function stripExtension(s: string) {
@@ -153,23 +154,95 @@ function packLinear(spacing: number, padding: number) {
 
   console.log(jsoPack);
 
-  // Pack into canvas
-  mapCanvas.width = w;
-  mapCanvas.height = h;
-  const ctx = mapCanvas.getContext("2d")!;
-  for (const sprite of icons) {
-    ctx.drawImage(sprite.image, sprite.x, sprite.y);
-  }
+  drawCanvas(w, h);
 }
 
-interface SpriteTree {
-  width: number;
-  height: number;
+interface PackTree {
   x: number;
   y: number;
-  sprite: SpriteLayout | null;
-  right: SpriteTree | null;
-  bottom: SpriteTree | null;
+  w: number;
+  h: number;
+  sprite?: SpriteLayout;
+  first?: PackTree;
+  second?: PackTree;
+}
+function packTree(spritePadding: number, padding: number, w: number, h: number) {
+  const tree: PackTree = {
+    x: padding,
+    y: padding,
+    w: w - (padding * 2),
+    h: h - (padding * 2)
+  }
+
+  function add(tree: PackTree, sprite: SpriteLayout) {
+    if (!tree.sprite && (tree.w >= (spritePadding * 2 + sprite.width)) && (tree.h >= (spritePadding + sprite.height))) {
+      // Empty: add it at the top left
+      tree.sprite = sprite;
+      sprite.x = tree.x + spritePadding;
+      sprite.y = tree.y + spritePadding;
+      // Create child rects. Make them as "square" as possible
+      const spriteWidth = 2 * spritePadding + sprite.width;
+      const spriteHeight = 2 * spritePadding + sprite.height;
+      const rightSpace = tree.w - spriteWidth;
+      const bottomSpace = tree.h - spriteHeight;
+      if (rightSpace >= bottomSpace) {
+        tree.first = {
+          x: tree.x + spriteWidth,
+          y: tree.y,
+          w: rightSpace,
+          h: spriteHeight
+        };
+        tree.second = {
+          x: tree.x,
+          y: tree.y + spriteHeight,
+          w: tree.w,
+          h: bottomSpace
+        };
+      }
+      else {
+        tree.second = {
+          x: tree.x + spriteWidth,
+          y: tree.y,
+          w: rightSpace,
+          h: tree.h
+        };
+        tree.first = {
+          x: tree.x,
+          y: tree.y + spriteHeight,
+          w: spriteWidth,
+          h: bottomSpace
+        };
+      }
+      return true;
+    }
+    else {
+      if (tree.first && add(tree.first, sprite)) {
+        return true;
+      }
+      if (tree.second && add(tree.second, sprite)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  for (const sprite of icons) {
+    console.log(sprite.name);
+    if (!add(tree, sprite)) {
+      console.log(JSON.stringify(tree, undefined, 4));
+      alert("Error: did not allocate enough space for sprite");
+      return;
+    }
+  }
+
+  console.log(`Packed: w = ${w}, h = ${h}`);
+
+  // Create json pack info
+  createPackInfo(w, h);
+
+  console.log(jsoPack);
+
+  drawCanvas(w, h);
 }
 
 function toFrame(sprite: SpriteLayout): FrameDef {
@@ -213,4 +286,14 @@ function createPackInfo(w: number, h: number) {
       "scale": "1"
     }
   };
+}
+
+function drawCanvas(w: number, h: number) {
+  // Draw into canvas
+  mapCanvas.width = w;
+  mapCanvas.height = h;
+  const ctx = mapCanvas.getContext("2d")!;
+  for (const sprite of icons) {
+    ctx.drawImage(sprite.image, sprite.x, sprite.y);
+  }
 }
