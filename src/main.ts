@@ -75,15 +75,7 @@ async function processDataTransfer(items: DataTransferItem[]) {
   icons = [];
   iconView.innerHTML = "";
   console.log(items);
-  const files = [];
-  for (const item of items) {
-    if (item.kind === "file") {
-      const f = item.getAsFile();
-      if (f) {
-        files.push(f)
-      }
-    }
-  }
+  const files = items.filter(item => (item.kind === "file")).map(item => item.getAsFile()!);
   files.sort((a, b) => a.name.localeCompare(b.name));
   for (const file of files) {
     console.log(`File ${file.name}`);
