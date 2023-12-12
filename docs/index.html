@@ -1,25 +1,50 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset='utf-8'>
   <meta http-equiv='X-UA-Compatible' content='IE=edge'>
   <title>Sprite Mapper</title>
   <meta name='viewport' content='width=device-width, initial-scale=1'>
-  <script type="module" crossorigin src="./assets/index-ZIrh79KN.js"></script>
+  <style>
+    body {
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+
+    #iconView {
+      margin-top: 10px;
+      width: max-content;
+      background: #7f7f7f;
+      color: white;
+      display: grid;
+      grid-template-columns: max-content max-content max-content;
+      align-items: center;
+      column-gap: 8px;
+      row-gap: 6px;
+      padding: 8px;
+    }
+  </style>
+  <script type="module" crossorigin src="./assets/index-5oFKCOqT.js"></script>
 </head>
+
 <body>
 
-<h1>Sprite mapper</h1>
+  <h1>Sprite mapper</h1>
 
-<p>Drop images on the canvas below to add them to the sprite map.</p>
+  <p>Drop images on the canvas below to add them to the sprite map.</p>
 
-<div id="divMessage"></div>
+  <div id="divMessage"></div>
 
-<canvas id="mapCanvas" style="background-color: #eeeeee;"></canvas>
+  <canvas id="mapCanvas" style="background-color: #7f7f7f;"></canvas>
 
-<div id="iconView" style="width: max-content; background: #7f7f7f;"></div>
+  <div>
+    <button id="bSave">Save</button>
+  </div>
 
-<button id="bSave">Save</button>
+  <div id="iconView">
+  </div>
+
 
 </body>
+
 </html>
