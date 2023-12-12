@@ -78,27 +78,35 @@ async function processDataTransfer(items: DataTransferItem[]) {
   const files = [];
   for (const item of items) {
     if (item.kind === "file") {
-      files.push(item.getAsFile())
+      const f = item.getAsFile();
+      if (f) {
+        files.push(f)
+      }
     }
   }
+  files.sort((a, b) => a.name.localeCompare(b.name));
   for (const file of files) {
-    if (file) {
-      console.log(`File ${file.name}`);
-      console.log(file.type);
-      try {
-        const img = await loadImage(file);
-        iconView.appendChild(img);
-        console.log(`image size: ${img.width} x ${img.height}`);
-        icons.push({ width: img.width, height: img.height, x: 0, y: 0, name: stripExtension(file.name), image: img });
+    console.log(`File ${file.name}`);
+    console.log(file.type);
+    try {
+      const img = await loadImage(file);
+      iconView.appendChild(img);
+      const dim = document.createElement("div");
+      dim.innerText = `${img.width} x ${img.height}`;
+      iconView.appendChild(dim);
+      const desc = document.createElement("div");
+      desc.innerText = file.name;
+      iconView.appendChild(desc);
+      console.log(`image size: ${img.width} x ${img.height}`);
+      icons.push({ width: img.width, height: img.height, x: 0, y: 0, name: stripExtension(file.name), image: img });
+    }
+    catch (e) {
+      numErrors++;
+      console.error(`Cannot load image ${file.name}`);
+      if (file.type === "image/svg+xml") {
+        console.log("For SVG file, make sure the xml namespace is included: xmlns=\"http://www.w3.org/2000/svg\"");
       }
-      catch (e) {
-        numErrors++;
-        console.error(`Cannot load image ${file.name}`);
-        if (file.type === "image/svg+xml") {
-          console.log("For SVG file, make sure the xml namespace is included: xmlns=\"http://www.w3.org/2000/svg\"");
-        }
-        console.log(e);
-      }
+      console.log(e);
     }
   }
   // Sort icons, from largest to smallest

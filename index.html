@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset='utf-8'>
   <meta http-equiv='X-UA-Compatible' content='IE=edge'>
@@ -7,19 +8,26 @@
   <meta name='viewport' content='width=device-width, initial-scale=1'>
   <script src='./src/main.ts' type="module"></script>
 </head>
+
 <body>
 
-<h1>Sprite mapper</h1>
+  <h1>Sprite mapper</h1>
 
-<p>Drop images on the canvas below to add them to the sprite map.</p>
+  <p>Drop images on the canvas below to add them to the sprite map.</p>
 
-<div id="divMessage"></div>
+  <div id="divMessage"></div>
 
-<canvas id="mapCanvas" style="background-color: #eeeeee;"></canvas>
+  <canvas id="mapCanvas" style="background-color: #7f7f7f;"></canvas>
 
-<div id="iconView" style="width: max-content; background: #7f7f7f;"></div>
+  <div>
+    <button id="bSave">Save</button>
+  </div>
 
-<button id="bSave">Save</button>
+  <div id="iconView"
+    style="width: max-content; background: #7f7f7f; display: grid; grid-template-columns: max-content max-content max-content; align-items: center; gap: 4px; padding: 8px;">
+  </div>
+
 
 </body>
+
 </html>
