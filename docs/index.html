@@ -14,17 +14,38 @@
     #iconView {
       margin-top: 10px;
       width: max-content;
-      background: #7f7f7f;
-      color: white;
       display: grid;
-      grid-template-columns: max-content max-content max-content;
+      grid-template-columns: repeat(9, max-content);
       align-items: center;
       column-gap: 8px;
       row-gap: 6px;
       padding: 8px;
+      background-color: #d7edf4
+    }
+
+    #colorSelect {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    #colorSelect>div {
+      width: 30px;
+      height: 30px;
+      border-width: 2px;
+      border-style: solid;
+      border-color: transparent;
+    }
+
+    #divMessage {
+      margin-bottom: 10px;
+    }
+
+    .selected {
+      border-color: #57bfe4 !important;
     }
   </style>
-  <script type="module" crossorigin src="./assets/index-5oFKCOqT.js"></script>
+  <script type="module" crossorigin src="./assets/index-bOUEVXCN.js"></script>
 </head>
 
 <body>
@@ -39,6 +60,11 @@
 
   <div>
     <button id="bSave">Save</button>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+    <div>Icon background:</div>
+    <div id="colorSelect"></div>
   </div>
 
   <div id="iconView">
