@@ -3,7 +3,6 @@ const mapCanvas = document.getElementById("mapCanvas") as HTMLCanvasElement;
 const divMessage = document.getElementById("divMessage")!;
 const bSave = document.getElementById("bSave")!;
 
-
 interface SpriteLayout {
   width: number;
   height: number;
@@ -82,6 +81,7 @@ async function processDataTransfer(items: DataTransferItem[]) {
     console.log(file.type);
     try {
       const img = await loadImage(file);
+      img.style.backgroundColor = colors[colorIndex];
       iconView.appendChild(img);
       const dim = document.createElement("div");
       dim.innerText = `${img.width} x ${img.height}`;
@@ -104,7 +104,7 @@ async function processDataTransfer(items: DataTransferItem[]) {
   // Sort icons, from largest to smallest
   icons.sort((a, b) => Math.max(b.width, b.height) - Math.max(a.width, a.height));
   const errorText = numErrors ? ` <span style="color: red;">Errors: ${numErrors}.</span>` : '';
-  divMessage.innerHTML = `Added ${icons.length} icons.${errorText}`;
+  divMessage.innerHTML = `${icons.length} icons in sprite sheet.${errorText}`;
 
   // packLinear(1, 1);
   packTree(1, 1, 256, 256);
@@ -299,3 +299,35 @@ function drawCanvas(w: number, h: number) {
     ctx.drawImage(sprite.image, sprite.x, sprite.y);
   }
 }
+
+
+const colors = ["#cccccc", "#7f7f7f", "#000000"];
+const colorSelect = document.getElementById("colorSelect")!;
+var colorIndex = -1;
+function populateColorSelect() {
+  colors.forEach((c, i) => {
+    const div = document.createElement("div");
+    div.style.backgroundColor = c;
+    colorSelect.appendChild(div);
+    div.onclick = () => setColorIndex(i);
+  });
+}
+function setColorIndex(i: number) {
+  if (i !== colorIndex) {
+    if (colorIndex >= 0) {
+      const c = colorSelect.children[colorIndex] as HTMLDivElement;
+      c.className = "";
+    }
+    colorIndex = i;
+    if (colorIndex >= 0) {
+      const c = colorSelect.children[colorIndex] as HTMLDivElement;
+      c.className = "selected";
+    }
+  }
+  // Update icons in list
+  for (const icon of iconView.querySelectorAll<HTMLImageElement>("img")) {
+    icon.style.backgroundColor = colors[colorIndex]
+  }
+}
+populateColorSelect();
+setColorIndex(0);
