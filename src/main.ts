@@ -1,3 +1,6 @@
+const SHEET_WIDTH = 512;
+const SHEET_HEIGHT = 512;
+
 const iconView = document.getElementById("iconView")!;
 const mapCanvas = document.getElementById("mapCanvas") as HTMLCanvasElement;
 const divMessage = document.getElementById("divMessage")!;
@@ -107,7 +110,7 @@ async function processDataTransfer(items: DataTransferItem[]) {
   divMessage.innerHTML = `${icons.length} icons in sprite sheet.${errorText}`;
 
   // packLinear(1, 1);
-  packTree(1, 1, 256, 256);
+  packTree(1, 1, SHEET_WIDTH, SHEET_HEIGHT);
 }
 
 function stripExtension(s: string) {
