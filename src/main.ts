@@ -36,6 +36,10 @@ interface FrameDef {
   }
 }
 
+/** App version is injected from the vite configuration file */
+declare const __APP_VERSION__: string;
+document.title = `Sprite Mapper ${__APP_VERSION__}`;
+
 // Make the demo a drop zone for loading json
 mapCanvas.ondrop = (evt) => {
   // Prevent file from being opened
